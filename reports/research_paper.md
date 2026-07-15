@@ -5,6 +5,7 @@
 **Institution:** [Institution Name]  
 **Project Mentor:** [Mentor Name]  
 **Submission Date:** July 15, 2026  
+**Platform Name:** Attrix  
 
 ---
 
@@ -27,7 +28,7 @@ This paper investigates historical workforce attrition patterns within Palo Alto
 ## 2. Background and Context
 The recruitment of specialized cybersecurity expertise is a major challenge in modern technology management. High turnover rates disrupt ongoing engineering sprints, sales cycles, and security operations. Voluntary exits often cluster within specific divisions due to systemic factors such as workload burnout (chronic overtime), mobility friction (excessive business travel), and early-tenure onboarding misalignment. 
 
-This project was conceived as an interactive Workforce Intelligence platform designed for people operations leaders. It evaluates historical employee profiles to isolate operational areas with high attrition rates and exit volumes, facilitating proactive, targeted HR interventions.
+This project was conceived as an interactive Attrix platform designed for people operations leaders. It evaluates historical employee profiles to isolate operational areas with high attrition rates and exit volumes, facilitating proactive, targeted HR interventions.
 
 ---
 
@@ -143,7 +144,7 @@ Observed demographic patterns (like higher attrition among single employees) mus
 ---
 
 ## 14. Conclusion
-This study presents a descriptive and diagnostic analysis of workforce attrition at Palo Alto Networks. By segmenting employee data across departments, roles, career levels, and workload demands, the Workforce Intelligence platform isolates actionable hotspots. Regular overtime and frequent business travel represent clear areas of friction. The implementation of early-tenure onboarding checkpoints, resource capacity planning, and flexible travel guidelines provides a comprehensive, data-linked strategy to stabilize talent and retain institutional expertise.
+This study presents a descriptive and diagnostic analysis of workforce attrition at Palo Alto Networks. By segmenting employee data across departments, roles, career levels, and workload demands, the Attrix platform isolates actionable hotspots. Regular overtime and frequent business travel represent clear areas of friction. The implementation of early-tenure onboarding checkpoints, resource capacity planning, and flexible travel guidelines provides a comprehensive, data-linked strategy to stabilize talent and retain institutional expertise.
 
 ---
 

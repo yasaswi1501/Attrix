@@ -26,8 +26,8 @@ def show_overview():
     
     # Render unified Apple-inspired Header
     render_page_header(
-        title="Workforce Attrition Intelligence",
-        subtitle="Operational patterns, concentration areas, and organizational risk hotspots",
+        title="Attrix",
+        subtitle="Enterprise workforce intelligence for understanding attrition patterns, organizational concentration areas, and retention risk hotspots.",
         employee_count=active_count,
         total_count=total_count
     )

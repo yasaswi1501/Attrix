@@ -251,7 +251,7 @@ def show_risk_hotspots():
         st.download_button(
             label="📥 Export Hotspot Priority Ledger (CSV)",
             data=csv_bytes,
-            file_name="risk_hotspot_priority_ledger.csv",
+            file_name="attrix_risk_hotspots.csv",
             mime="text/csv"
         )
 

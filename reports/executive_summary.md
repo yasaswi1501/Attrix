@@ -1,4 +1,4 @@
-# Executive Summary: Workforce Attrition Patterns and Retention Strategies
+# Attrix — Executive Workforce Intelligence Summary
 
 **Date:** July 15, 2026  
 **Audience:** HR Leadership, Department Heads, Executive Board  

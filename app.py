@@ -4,7 +4,7 @@ import pandas as pd
 
 # 1. SET PAGE CONFIG (MUST BE FIRST)
 st.set_page_config(
-    page_title="Workforce Attrition Intelligence",
+    page_title="Attrix",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -65,7 +65,8 @@ def main():
     # 3. GLOBAL SIDEBAR FILTERS
     st.sidebar.markdown(
         '<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">'
-        '<span style="font-size: 20px; font-weight: 800; color: #1D1D1F; letter-spacing: -0.5px;">Workforce Intelligence</span>'
+        '<span style="font-size: 22px; font-weight: 800; color: #1D1D1F; letter-spacing: -0.5px;">Attrix</span>'
+        '<div style="font-size: 11.5px; color: #6E6E73; margin-top: 2px;">Workforce Intelligence Platform</div>'
         '</div>',
         unsafe_allow_html=True
     )

@@ -1,6 +1,8 @@
-# Workforce Attrition Patterns & Risk Hotspots Analytics
+# Attrix
 
-An interactive diagnostic people analytics platform designed to analyze voluntary employee departures, isolate high-risk hotspots, and provide actionable, evidence-linked retention guidelines. 
+Enterprise Workforce Intelligence & Attrition Risk Analytics Platform
+
+An interactive diagnostic people analytics platform designed to analyze voluntary employee departures, isolate high-risk hotspots, and provide actionable, evidence-linked retention guidelines. Official repository: [https://github.com/yasaswi1501/Attrix](https://github.com/yasaswi1501/Attrix)
 
 ---
 

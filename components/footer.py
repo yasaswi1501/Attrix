@@ -14,3 +14,14 @@ def render_footer(sample_size: int):
     # 2. Case Study and Causation Disclaimers
     render_academic_disclaimer()
     render_causation_disclaimer()
+
+    # 3. Attrix Platform branding footer
+    st.markdown(
+        """
+        <div style="font-size: 11px; color: #86868B; text-align: center; margin-top: 24px; margin-bottom: 24px;">
+            Attrix — Workforce Intelligence & Attrition Risk Analytics<br>
+            <span style="font-size: 10.5px; color: #86868B; font-weight: 400;">Built with Python, Streamlit, Pandas, and Plotly.</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
