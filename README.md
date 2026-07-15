@@ -20,7 +20,8 @@ unified mentor project - 1/
 │   └── config.toml            # Apple-inspired light theme presets
 │
 ├── data/
-│   └── Palo Alto Networks.csv # Workforce dataset
+│   └── raw/
+│       └── Palo Alto Networks.csv # Workforce dataset
 │
 ├── components/
 │   ├── __init__.py
@@ -95,3 +96,9 @@ Or, if running without pytest command mapping:
 ```bash
 python3 -m unittest discover -s tests
 ```
+
+---
+
+## Product Specification
+
+Attrix is governed by the Attrix Product Architecture & Engineering Specification (APAES). The complete specification suite is maintained inside the `docs/` directory.

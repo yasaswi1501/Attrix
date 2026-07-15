@@ -1,22 +1,20 @@
 import plotly.io as pio
 import plotly.graph_objects as go
 
-# Color Palette Definitions (Apple-inspired Light Theme)
-COLOR_BACKGROUND_TRANSPARENT = "rgba(0,0,0,0)"
-COLOR_PRIMARY_TEXT = "#1D1D1F"
-COLOR_SECONDARY_TEXT = "#6E6E73"
-COLOR_MUTED_TEXT = "#86868B"
-COLOR_BORDER = "rgba(0, 0, 0, 0.08)"
-COLOR_GRID = "rgba(0, 0, 0, 0.04)"
-
-# Domain Colors
-COLOR_RETENTION = "#2E7D5B"       # Safe Green
-COLOR_ATTENTION = "#C9792B"       # Alert Orange
-COLOR_ELEVATED_RISK = "#B54747"   # Critical Red
-COLOR_ACCENT_BLUE = "#0071E3"     # Accent Blue
-COLOR_NEUTRAL_GREY = "#8E8E93"    # Neutral Grey
-
-FONT_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", sans-serif'
+from config.settings import (
+    COLOR_BACKGROUND_TRANSPARENT,
+    COLOR_PRIMARY_TEXT,
+    COLOR_SECONDARY_TEXT,
+    COLOR_MUTED_TEXT,
+    COLOR_BORDER,
+    COLOR_GRID,
+    COLOR_RETENTION,
+    COLOR_ATTENTION,
+    COLOR_ELEVATED_RISK,
+    COLOR_ACCENT_BLUE,
+    COLOR_NEUTRAL_GREY,
+    FONT_STACK
+)
 
 def get_chart_theme_layout() -> dict:
     """
@@ -28,12 +26,12 @@ def get_chart_theme_layout() -> dict:
         "font": {
             "family": FONT_STACK,
             "color": COLOR_PRIMARY_TEXT,
-            "size": 13
+            "size": 12.5
         },
-        "margin": {"t": 60, "b": 50, "l": 50, "r": 30},
+        "margin": {"t": 45, "b": 35, "l": 45, "r": 20, "pad": 4},
         "title": {
             "font": {
-                "size": 16,
+                "size": 14,
                 "color": COLOR_PRIMARY_TEXT,
                 "weight": "bold"
             },
@@ -42,29 +40,29 @@ def get_chart_theme_layout() -> dict:
         },
         "legend": {
             "font": {
-                "size": 12,
+                "size": 11,
                 "color": COLOR_SECONDARY_TEXT
             },
             "bgcolor": COLOR_BACKGROUND_TRANSPARENT,
             "orientation": "h",
             "yanchor": "bottom",
-            "y": -0.2,
+            "y": -0.22,
             "xanchor": "center",
             "x": 0.5
         },
         "xaxis": {
             "gridcolor": COLOR_GRID,
             "linecolor": COLOR_BORDER,
-            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 11},
-            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 12},
+            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 10.5},
+            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 11.5},
             "zeroline": False,
-            "showgrid": True
+            "showgrid": False
         },
         "yaxis": {
             "gridcolor": COLOR_GRID,
             "linecolor": COLOR_BORDER,
-            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 11},
-            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 12},
+            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 10.5},
+            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 11.5},
             "zeroline": False,
             "showgrid": True
         },
@@ -76,12 +74,26 @@ def get_chart_theme_layout() -> dict:
                 "size": 12
             },
             "bordercolor": COLOR_BORDER
+        },
+        "modebar": {
+            "activecolor": COLOR_ACCENT_BLUE,
+            "bgcolor": COLOR_BACKGROUND_TRANSPARENT,
+            "color": COLOR_NEUTRAL_GREY,
+            "remove": ["zoom", "pan", "select", "lasso2d", "zoomIn", "zoomOut", "autoScale", "hoverClosestCartesian", "hoverCompareCartesian", "toggleSpikelines"]
         }
     }
 
-def apply_apple_theme(fig: go.Figure, title: str = "", xaxis_title: str = "", yaxis_title: str = "", height: int = 380, show_legend: bool = False) -> go.Figure:
+def apply_apple_theme(
+    fig: go.Figure, 
+    title: str = "", 
+    xaxis_title: str = "", 
+    yaxis_title: str = "", 
+    height: int = 320, 
+    show_legend: bool = False
+) -> go.Figure:
     """
-    Applies the custom Apple theme to an existing Plotly figure object.
+    Applies the custom Apple/Stripe-inspired theme to an existing Plotly figure object.
+    Automatically handles gridlines based on horizontal/vertical trace orientation.
     """
     theme = get_chart_theme_layout()
     theme["title"]["text"] = title
@@ -93,30 +105,59 @@ def apply_apple_theme(fig: go.Figure, title: str = "", xaxis_title: str = "", ya
         margin=theme["margin"],
         title=theme["title"],
         showlegend=show_legend,
-        height=height
+        height=height,
+        modebar=theme["modebar"]
     )
     
     if show_legend:
         fig.update_layout(legend=theme["legend"])
         
-    fig.update_xaxes(
-        gridcolor=theme["xaxis"]["gridcolor"],
-        linecolor=theme["xaxis"]["linecolor"],
-        tickfont=theme["xaxis"]["tickfont"],
-        title_font=theme["xaxis"]["titlefont"],
-        zeroline=theme["xaxis"]["zeroline"],
-        showgrid=theme["xaxis"]["showgrid"],
-        title_text=xaxis_title
-    )
-    
-    fig.update_yaxes(
-        gridcolor=theme["yaxis"]["gridcolor"],
-        linecolor=theme["yaxis"]["linecolor"],
-        tickfont=theme["yaxis"]["tickfont"],
-        title_font=theme["yaxis"]["titlefont"],
-        zeroline=theme["yaxis"]["zeroline"],
-        showgrid=theme["yaxis"]["showgrid"],
-        title_text=yaxis_title
-    )
+    # Check trace orientation to toggle horizontal/vertical gridline states
+    is_horizontal = False
+    for trace in fig.data:
+        if hasattr(trace, 'orientation') and trace.orientation == 'h':
+            is_horizontal = True
+            break
+
+    if is_horizontal:
+        # Horizontal bars need vertical grids
+        fig.update_xaxes(
+            gridcolor=theme["xaxis"]["gridcolor"],
+            linecolor=theme["xaxis"]["linecolor"],
+            tickfont=theme["xaxis"]["tickfont"],
+            title_font=theme["xaxis"]["titlefont"],
+            zeroline=False,
+            showgrid=True,
+            title_text=xaxis_title
+        )
+        fig.update_yaxes(
+            gridcolor=theme["yaxis"]["gridcolor"],
+            linecolor=theme["yaxis"]["linecolor"],
+            tickfont=theme["yaxis"]["tickfont"],
+            title_font=theme["yaxis"]["titlefont"],
+            zeroline=False,
+            showgrid=False,
+            title_text=yaxis_title
+        )
+    else:
+        # Vertical bars / lines / scatters need horizontal grids
+        fig.update_xaxes(
+            gridcolor=theme["xaxis"]["gridcolor"],
+            linecolor=theme["xaxis"]["linecolor"],
+            tickfont=theme["xaxis"]["tickfont"],
+            title_font=theme["xaxis"]["titlefont"],
+            zeroline=False,
+            showgrid=False,
+            title_text=xaxis_title
+        )
+        fig.update_yaxes(
+            gridcolor=theme["yaxis"]["gridcolor"],
+            linecolor=theme["yaxis"]["linecolor"],
+            tickfont=theme["yaxis"]["tickfont"],
+            title_font=theme["yaxis"]["titlefont"],
+            zeroline=False,
+            showgrid=True,
+            title_text=yaxis_title
+        )
     
     return fig

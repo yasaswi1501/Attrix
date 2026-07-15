@@ -66,25 +66,31 @@ def show_recommendations():
         st.markdown(
             f"""
             <div class="apple-card" style="margin-bottom: 24px; border-left: 4px solid #0071E3;">
-                <h4 style="font-size: 16px; font-weight: 700; color: #1D1D1F; margin-top: 0; margin-bottom: 12px;">{title}</h4>
-                <div style="font-size: 13.5px; line-height: 1.6; color: #333333;">
-                    <p><strong>📊 Observed Data Evidence:</strong><br>{evidence}</p>
-                    <p><strong>💡 Recommended Action Plan:</strong><br>{action}</p>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; font-size: 12.5px;">
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                            <td style="padding: 6px 0; font-weight: 600; color: #6E6E73; width: 25%;">Suggested Owner:</td>
-                            <td style="padding: 6px 0; color: #1D1D1F;">{owner}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                            <td style="padding: 6px 0; font-weight: 600; color: #6E6E73;">Suggested Timeline:</td>
-                            <td style="padding: 6px 0; color: #1D1D1F;">{timeline}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                            <td style="padding: 6px 0; font-weight: 600; color: #6E6E73;">Success Metrics:</td>
-                            <td style="padding: 6px 0; color: #1D1D1F;">{metrics}</td>
-                        </tr>
-                    </table>
-                    <p style="font-size: 12px; color: #86868B; margin-top: 8px;"><em>⚠️ Risk Caution:</em> {caution}</p>
+                <div style="font-size: 15px; font-weight: 700; color: #1D1D1F; margin-bottom: 12px;">{title}</div>
+                <div style="font-size: 13.5px; line-height: 1.55; color: #1D1D1F; margin-bottom: 14px;">
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #6E6E73;">📊 Observed Evidence:</strong> {evidence}
+                    </div>
+                    <div>
+                        <strong style="color: #6E6E73;">💡 Recommendation:</strong> {action}
+                    </div>
+                </div>
+                <div style="background-color: #FBFBFD; border-radius: 8px; padding: 10px 14px; border: 1px solid rgba(0,0,0,0.04); margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                        <span style="color: #86868B;">Suggested Owner:</span>
+                        <span style="font-weight: 500; color: #1D1D1F;">{owner}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                        <span style="color: #86868B;">Suggested Timeline:</span>
+                        <span style="font-weight: 500; color: #1D1D1F;">{timeline}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <span style="color: #86868B;">Success Metric:</span>
+                        <span style="font-weight: 500; color: #1D1D1F;">{metrics}</span>
+                    </div>
+                </div>
+                <div style="font-size: 11.5px; color: #86868B; line-height: 1.4;">
+                    <strong>⚠️ Risk Caution:</strong> {caution}
                 </div>
             </div>
             """,

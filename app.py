@@ -35,8 +35,10 @@ if "engineered_df" not in st.session_state:
 if "filtered_df" not in st.session_state:
     st.session_state["filtered_df"] = None
 
-# Cross-platform relative path lookup
-DATA_PATH = Path(__file__).parent / "data" / "Palo Alto Networks.csv"
+from config.settings import RAW_DATA_PATH
+
+# Cross-platform relative path lookup from config settings
+DATA_PATH = RAW_DATA_PATH
 
 def main():
     # 2. DATA LOADING PIPELINE (Run once per session)

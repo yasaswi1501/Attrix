@@ -97,3 +97,21 @@ def render_statistical_limitation():
         """,
         unsafe_allow_html=True
     )
+
+def render_information_panel(title: str, text: str):
+    """
+    Renders an Apple-inspired premium informational banner.
+    """
+    st.markdown(
+        f"""
+        <div class="apple-card" style="background-color: #FBFBFD; border: 1px solid rgba(0, 113, 227, 0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
+            <div style="font-size: 13px; font-weight: 600; color: #0071E3; margin-bottom: 6px;">
+                ℹ️ {title}
+            </div>
+            <div style="font-size: 12.5px; color: #6E6E73; line-height: 1.5;">
+                {text}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )

@@ -41,20 +41,13 @@ def show_departments_roles():
     exited_employees = metrics["exited_employees"]
 
     # Brief explanation block distinguishing Rate vs Volume
-    st.markdown(
-        """
-        <div class="apple-card" style="background-color: #FBFBFD;">
-            <p style="margin: 0; font-size: 13px; color: #6E6E73; line-height: 1.5;">
-                <strong>Analytical Distinction: Attrition Rate vs. Exit Volume.</strong><br>
-                A department or role might have a high <strong>Attrition Rate</strong> but a low <strong>Exit Count</strong> due to a small overall headcount (rate spike). 
-                Conversely, a large department might have a moderate rate but contribute a massive <strong>Exit Volume</strong>. 
-                Both views are crucial: rates indicate concentrated culture or workload friction, while volume indicates operational knowledge drain.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
+    from components.disclaimer import render_information_panel
+    render_information_panel(
+        title="Analytical Distinction: Attrition Rate vs. Exit Volume",
+        text="A department or role might have a high Attrition Rate but a low Exit Count due to a small overall headcount (rate spike). "
+             "Conversely, a large department might have a moderate rate but contribute a massive Exit Volume. "
+             "Both views are crucial: rates indicate concentrated culture or workload friction, while volume indicates operational knowledge drain."
     )
-    st.markdown("<br>", unsafe_allow_html=True)
 
     # Tabs for Department and Job Role View
     tab1, tab2, tab3 = st.tabs(["🏢 Department Analysis", "💼 Job Role Analysis", "🗺️ Department × Role Heatmap"])
