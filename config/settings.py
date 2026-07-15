@@ -7,20 +7,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 RAW_DATA_PATH = DATA_DIR / "raw" / "Palo Alto Networks.csv"
 
-# Color Palette Definitions (Apple-inspired Light Theme)
+# Color Palette Definitions (Apple-inspired Dark Theme)
 COLOR_BACKGROUND_TRANSPARENT = "rgba(0,0,0,0)"
-COLOR_PRIMARY_TEXT = "#1D1D1F"
-COLOR_SECONDARY_TEXT = "#6E6E73"
-COLOR_MUTED_TEXT = "#86868B"
-COLOR_BORDER = "rgba(0, 0, 0, 0.06)"
-COLOR_GRID = "rgba(0, 0, 0, 0.04)"
+COLOR_PRIMARY_TEXT = "#F4F4F5"      # Zinc 100
+COLOR_SECONDARY_TEXT = "#A1A1AA"    # Zinc 400
+COLOR_MUTED_TEXT = "#71717A"        # Zinc 500
+COLOR_BORDER = "rgba(255, 255, 255, 0.08)"
+COLOR_GRID = "rgba(255, 255, 255, 0.04)"
 
-# Domain Colors
-COLOR_RETENTION = "#2E7D5B"       # Safe Green
-COLOR_ATTENTION = "#C9792B"       # Alert Orange
-COLOR_ELEVATED_RISK = "#B54747"   # Critical Red
-COLOR_ACCENT_BLUE = "#0071E3"     # Accent Blue
-COLOR_NEUTRAL_GREY = "#8E8E93"    # Neutral Grey
+# Domain Colors (Muted Dark Mode equivalents)
+COLOR_RETENTION = "#10B981"       # Safe Emerald
+COLOR_ATTENTION = "#F59E0B"       # Alert Amber
+COLOR_ELEVATED_RISK = "#EF4444"   # Critical Red
+COLOR_ACCENT_BLUE = "#3B82F6"     # Accent Blue
+COLOR_NEUTRAL_GREY = "#4B5563"    # Gray 600
 
 FONT_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", sans-serif'
 

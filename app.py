@@ -5,7 +5,7 @@ import pandas as pd
 # 1. SET PAGE CONFIG (MUST BE FIRST)
 st.set_page_config(
     page_title="Attrix",
-    page_icon="📊",
+    page_icon="assets/icons/attrix-favicon.svg",
     layout="wide",
     initial_sidebar_state="expanded"
 )

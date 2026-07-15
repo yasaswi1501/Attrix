@@ -44,3 +44,38 @@ def render_insight_card(
         """,
         unsafe_allow_html=True
     )
+
+def render_dynamic_insight_card(
+    title: str,
+    finding: str,
+    recommendation: str,
+    confidence: str,
+    owner: str,
+    priority: str
+):
+    """
+    Renders a premium reusable card containing dynamic insights, recommendations, and metrics context.
+    """
+    risk_color = "#B54747" if priority.lower() == "critical" else ("#C9792B" if priority.lower() == "high" else "#0071E3")
+    
+    st.markdown(
+        f"""
+        <div class="apple-card" style="border-left: 3px solid {risk_color}; padding: 14px 16px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 13.5px; font-weight: 700; color: #1D1D1F;">{title}</span>
+                <span class="filter-chip" style="background-color: rgba(0, 113, 227, 0.05); color: #0071E3; font-weight: 600; font-size: 10px;">{confidence}</span>
+            </div>
+            <p style="font-size: 12.5px; color: #1D1D1F; line-height: 1.45; margin-bottom: 8px;">
+                <strong>Finding:</strong> {finding}
+            </p>
+            <p style="font-size: 12px; color: #6E6E73; line-height: 1.4; margin-bottom: 8px; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 6px;">
+                <strong>Suggested Action:</strong> {recommendation}
+            </p>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #86868B; margin-top: 6px;">
+                <span>Owner: {owner}</span>
+                <span style="color: {risk_color}; font-weight: 600;">Priority: {priority}</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )

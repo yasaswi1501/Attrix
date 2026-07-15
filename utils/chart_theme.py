@@ -18,21 +18,20 @@ from config.settings import (
 
 def get_chart_theme_layout() -> dict:
     """
-    Returns the standard layout options to be merged into Plotly charts.
+    Returns the standard layout options to be merged into Plotly charts,
+    relying on Streamlit's native theme engine to format axis text and gridlines.
     """
     return {
-        "paper_bgcolor": COLOR_BACKGROUND_TRANSPARENT,
-        "plot_bgcolor": COLOR_BACKGROUND_TRANSPARENT,
+        "paper_bgcolor": "rgba(0,0,0,0)",
+        "plot_bgcolor": "rgba(0,0,0,0)",
         "font": {
             "family": FONT_STACK,
-            "color": COLOR_PRIMARY_TEXT,
             "size": 12.5
         },
         "margin": {"t": 45, "b": 35, "l": 45, "r": 20, "pad": 4},
         "title": {
             "font": {
                 "size": 14,
-                "color": COLOR_PRIMARY_TEXT,
                 "weight": "bold"
             },
             "x": 0.0,
@@ -40,10 +39,9 @@ def get_chart_theme_layout() -> dict:
         },
         "legend": {
             "font": {
-                "size": 11,
-                "color": COLOR_SECONDARY_TEXT
+                "size": 11
             },
-            "bgcolor": COLOR_BACKGROUND_TRANSPARENT,
+            "bgcolor": "rgba(0,0,0,0)",
             "orientation": "h",
             "yanchor": "bottom",
             "y": -0.22,
@@ -51,33 +49,23 @@ def get_chart_theme_layout() -> dict:
             "x": 0.5
         },
         "xaxis": {
-            "gridcolor": COLOR_GRID,
-            "linecolor": COLOR_BORDER,
-            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 10.5},
-            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 11.5},
             "zeroline": False,
             "showgrid": False
         },
         "yaxis": {
-            "gridcolor": COLOR_GRID,
-            "linecolor": COLOR_BORDER,
-            "tickfont": {"color": COLOR_SECONDARY_TEXT, "size": 10.5},
-            "titlefont": {"color": COLOR_PRIMARY_TEXT, "size": 11.5},
             "zeroline": False,
             "showgrid": True
         },
         "hoverlabel": {
-            "bgcolor": "#FFFFFF",
+            "bgcolor": "#18181B",
             "font": {
                 "family": FONT_STACK,
-                "color": COLOR_PRIMARY_TEXT,
                 "size": 12
-            },
-            "bordercolor": COLOR_BORDER
+            }
         },
         "modebar": {
             "activecolor": COLOR_ACCENT_BLUE,
-            "bgcolor": COLOR_BACKGROUND_TRANSPARENT,
+            "bgcolor": "rgba(0,0,0,0)",
             "color": COLOR_NEUTRAL_GREY,
             "remove": ["zoom", "pan", "select", "lasso2d", "zoomIn", "zoomOut", "autoScale", "hoverClosestCartesian", "hoverCompareCartesian", "toggleSpikelines"]
         }
@@ -122,19 +110,11 @@ def apply_apple_theme(
     if is_horizontal:
         # Horizontal bars need vertical grids
         fig.update_xaxes(
-            gridcolor=theme["xaxis"]["gridcolor"],
-            linecolor=theme["xaxis"]["linecolor"],
-            tickfont=theme["xaxis"]["tickfont"],
-            title_font=theme["xaxis"]["titlefont"],
             zeroline=False,
             showgrid=True,
             title_text=xaxis_title
         )
         fig.update_yaxes(
-            gridcolor=theme["yaxis"]["gridcolor"],
-            linecolor=theme["yaxis"]["linecolor"],
-            tickfont=theme["yaxis"]["tickfont"],
-            title_font=theme["yaxis"]["titlefont"],
             zeroline=False,
             showgrid=False,
             title_text=yaxis_title
@@ -142,19 +122,11 @@ def apply_apple_theme(
     else:
         # Vertical bars / lines / scatters need horizontal grids
         fig.update_xaxes(
-            gridcolor=theme["xaxis"]["gridcolor"],
-            linecolor=theme["xaxis"]["linecolor"],
-            tickfont=theme["xaxis"]["tickfont"],
-            title_font=theme["xaxis"]["titlefont"],
             zeroline=False,
             showgrid=False,
             title_text=xaxis_title
         )
         fig.update_yaxes(
-            gridcolor=theme["yaxis"]["gridcolor"],
-            linecolor=theme["yaxis"]["linecolor"],
-            tickfont=theme["yaxis"]["tickfont"],
-            title_font=theme["yaxis"]["titlefont"],
             zeroline=False,
             showgrid=True,
             title_text=yaxis_title

@@ -15,14 +15,21 @@ from utils.chart_theme import (
 from components.kpi_cards import render_kpi_card
 from components.empty_states import render_empty_state
 from components.footer import render_footer
-from components.insight_cards import render_insight_card
-from components.executive_summary import render_executive_summary_card
+from components.insight_cards import render_dynamic_insight_card
+from components.status_strip import render_status_strip
+from components.disclaimer import (
+    render_academic_disclaimer,
+    render_causation_disclaimer,
+    render_statistical_limitation
+)
+from components.page_header import render_page_header
+from services.insights_engine import ExecutiveInsightsEngine
 
 def show_overview():
     """
-    Renders the flagship Executive Dashboard.
+    Renders the premium flagship Executive Overview page.
     """
-    # Fetch data from session state
+    # Fetch session data
     if "clean_df" not in st.session_state or st.session_state["clean_df"] is None:
         st.warning("Please upload or load the dataset first on the Methodology page.")
         return
@@ -34,6 +41,14 @@ def show_overview():
 
     total_count = len(raw_df)
     active_count = len(df)
+
+    # 1. PAGE HEADER (Replacing manual hero implementation)
+    render_page_header(
+        title="Attrix",
+        subtitle="Enterprise Workforce Intelligence",
+        employee_count=active_count,
+        total_count=total_count
+    )
 
     if active_count == 0:
         render_empty_state()
@@ -56,49 +71,42 @@ def show_overview():
     ot_yes_rate = (ot_yes_df["Attrition"] == 1).sum() / len(ot_yes_df) * 100 if len(ot_yes_df) > 0 else 0
     ot_no_rate = (ot_no_df["Attrition"] == 1).sum() / len(ot_no_df) * 100 if len(ot_no_df) > 0 else 0
 
-    # 1. HERO HEADER
-    hero_col1, hero_col2 = st.columns([5, 3])
-    with hero_col1:
-        st.markdown(
-            """
-            <div style="margin-top: 10px;">
-                <span style="font-size: 34px; font-weight: 800; color: #1D1D1F; letter-spacing: -1px; line-height: 1.1;">Attrix</span>
-                <div style="font-size: 15px; font-weight: 600; color: #0071E3; margin-top: 2px; margin-bottom: 8px;">Enterprise Workforce Intelligence Platform</div>
-                <p style="font-size: 13.5px; color: #6E6E73; line-height: 1.45; margin-right: 20px;">
-                    Transform complex workforce data into evidence-based organizational intelligence for strategic retention planning.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    with hero_col2:
-        st.markdown(
-            f"""
-            <div class="apple-card" style="background-color: #FBFBFD; padding: 12px 16px; margin-bottom: 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 4px;">
-                    <span style="color: #86868B; font-weight: 500;">TOTAL WORKFORCE:</span>
-                    <span style="font-weight: 600; color: #1D1D1F;">{total_count:,}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 4px;">
-                    <span style="color: #86868B; font-weight: 500;">ACTIVE COVERAGE:</span>
-                    <span style="font-weight: 600; color: #1D1D1F;">{active_count:,} ({round(active_count/total_count*100, 1)}%)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 4px;">
-                    <span style="color: #86868B; font-weight: 500;">DATA INTEGRITY:</span>
-                    <span style="font-weight: 600; color: #2E7D5B;">Excellent ({completeness_pct:.1f}%)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                    <span style="color: #86868B; font-weight: 500;">LAST ANALYSIS:</span>
-                    <span style="font-weight: 600; color: #1D1D1F;">Just now</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin-top: 20px; margin-bottom: 24px;">', unsafe_allow_html=True)
+    # Fetch dynamic insights
+    insights = ExecutiveInsightsEngine.generate_overview_insights(df, early_tenure_threshold)
 
-    # 2. EXECUTIVE SNAPSHOT (CRITICAL KPI CARDS)
-    st.markdown('<h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Core Workforce Snapshot</h3>', unsafe_allow_html=True)
+    # Supporting description rendered below the page header
+    st.markdown(
+        """
+        <p style="font-size: 13.5px; color: #A1A1AA; line-height: 1.45; margin-bottom: 20px; margin-top: -16px;">
+            Understand attrition patterns, organizational concentration areas, and workforce risk signals through clear, evidence-based analytics.
+        </p>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 2. STATUS STRIP (With dynamic baseline parameters)
+    has_filters = len(st.session_state.get("sidebar_filters", {})) > 0
+    render_status_strip(
+        active_count=active_count,
+        total_count=total_count,
+        completeness_pct=completeness_pct,
+        early_tenure_threshold=early_tenure_threshold,
+        has_filters=has_filters,
+        baseline_rate=baseline_rate
+    )
+
+    # 3. BUSINESS QUESTION BANNER
+    st.markdown(
+        f"""
+        <div class="filter-chip" style="background-color: rgba(59, 130, 246, 0.08); color: #3B82F6; font-weight: 500; margin-bottom: 20px; border: 1px solid rgba(59, 130, 246, 0.15);">
+            ❓ Business Question: What workforce patterns require immediate executive attention?
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 4. CORE WORKFORCE SNAPSHOT CARDS
+    st.markdown('<h3 style="font-size: 18px; font-weight: 600; margin-bottom: 14px;">Core Workforce Snapshot</h3>', unsafe_allow_html=True)
     kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5 = st.columns(5)
     
     with kpi_col1:
@@ -122,7 +130,8 @@ def show_overview():
         render_kpi_card(
             title="Attrition Rate",
             value=f"{metrics['overall_attrition_rate']:.1f}%",
-            context=trend_text,
+            context="Overall voluntary exits",
+            trend_text=trend_text,
             trend_type=trend_type,
             tooltip="Exited employees divided by total employees in active view, multiplied by 100."
         )
@@ -141,103 +150,73 @@ def show_overview():
         render_kpi_card(
             title="Early Tenure Attrition",
             value=f"{metrics['early_tenure_attrition_rate']:.1f}%",
-            context=early_trend_text,
+            context="Tenure <= threshold",
+            trend_text=early_trend_text,
             trend_type=early_trend_type,
             tooltip=f"Attrition rate of employees with tenure <= {early_tenure_threshold} years."
         )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 3. EXECUTIVE SUMMARY PANEL
-    render_executive_summary_card(
-        metrics=metrics,
-        top_dept=top_dept,
-        top_role=top_role,
-        ot_yes_rate=ot_yes_rate,
-        ot_no_rate=ot_no_rate,
-        early_tenure_threshold=early_tenure_threshold
-    )
-
-    # 4. KEY PRIORITIES ROW
-    st.markdown('<h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Retention Priority Assessment</h3>', unsafe_allow_html=True)
-    p_col1, p_col2, p_col3, p_col4 = st.columns(4)
-
-    with p_col1:
+    # 5. LEADERSHIP ATTENTION CARDS
+    st.markdown('<h3 style="font-size: 18px; font-weight: 600; margin-bottom: 14px;">Leadership Attention</h3>', unsafe_allow_html=True)
+    summary_col1, summary_col2, summary_col3, summary_col4 = st.columns(4)
+    
+    with summary_col1:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 155px; border-top: 3px solid #B54747; padding: 14px 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #B54747; text-transform: uppercase;">Critical Focus</span>
-                    <span class="status-badge" style="background-color: rgba(181, 71, 71, 0.06); color: #B54747; border: 1px solid rgba(181, 71, 71, 0.12); padding: 2px 6px; font-size: 9.5px;">LEVEL 1</span>
-                </div>
-                <div style="font-size: 13.5px; font-weight: 600; color: #1D1D1F; margin-bottom: 4px;">Sales Representatives</div>
-                <div style="font-size: 12px; color: #6E6E73; line-height: 1.4;">
-                    Rate of {top_role['Attrition Rate']:.1f}% represents extreme flight risk. Commission models and work scopes require review.
-                </div>
+            <div class="apple-card" style="min-height: 140px; border-left: 4px solid #EF4444; padding: 14px; margin-bottom: 16px;">
+                <div style="font-size: 10px; font-weight: 600; color: #EF4444; text-transform: uppercase; margin-bottom: 4px;">Departmental Risk</div>
+                <div style="font-size: 16px; font-weight: 700; color: #F4F4F5; margin-bottom: 4px;">{insights['department']['name']}</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.35;">Exceeds baseline by {top_dept['Attrition Rate'] - metrics['overall_attrition_rate']:+.1f} pp in view.</div>
             </div>
             """,
             unsafe_allow_html=True
         )
-    with p_col2:
-        multiplier = ot_yes_rate / ot_no_rate if ot_no_rate > 0 else 1.0
+    with summary_col2:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 155px; border-top: 3px solid #C9792B; padding: 14px 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #C9792B; text-transform: uppercase;">Elevated Focus</span>
-                    <span class="status-badge" style="background-color: rgba(201, 121, 43, 0.06); color: #C9792B; border: 1px solid rgba(201, 121, 43, 0.12); padding: 2px 6px; font-size: 9.5px;">LEVEL 2</span>
-                </div>
-                <div style="font-size: 13.5px; font-weight: 600; color: #1D1D1F; margin-bottom: 4px;">Overtime Workers</div>
-                <div style="font-size: 12px; color: #6E6E73; line-height: 1.4;">
-                    Overtime drives a {multiplier:.1f}x attrition increase. Operational capacity limits must be audited.
-                </div>
+            <div class="apple-card" style="min-height: 140px; border-left: 4px solid #F59E0B; padding: 14px; margin-bottom: 16px;">
+                <div style="font-size: 10px; font-weight: 600; color: #F59E0B; text-transform: uppercase; margin-bottom: 4px;">Overtime Exposure</div>
+                <div style="font-size: 16px; font-weight: 700; color: #F4F4F5; margin-bottom: 4px;">{ot_yes_rate:.1f}% Attrition</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.35;">Overtime acts as a key differentiator on departures.</div>
             </div>
             """,
             unsafe_allow_html=True
         )
-    with p_col3:
+    with summary_col3:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 155px; border-top: 3px solid #0071E3; padding: 14px 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #0071E3; text-transform: uppercase;">Active Monitor</span>
-                    <span class="status-badge" style="background-color: rgba(0, 113, 227, 0.06); color: #0071E3; border: 1px solid rgba(0, 113, 227, 0.12); padding: 2px 6px; font-size: 9.5px;">LEVEL 3</span>
-                </div>
-                <div style="font-size: 13.5px; font-weight: 600; color: #1D1D1F; margin-bottom: 4px;">Early-Tenure Cohorts</div>
-                <div style="font-size: 12px; color: #6E6E73; line-height: 1.4;">
-                    Exits in years 1 & 2 represent {metrics['early_tenure_exit_contribution']:.1f}% of departures. Onboarding checkpoints needed.
-                </div>
+            <div class="apple-card" style="min-height: 140px; border-left: 4px solid #3B82F6; padding: 14px; margin-bottom: 16px;">
+                <div style="font-size: 10px; font-weight: 600; color: #3B82F6; text-transform: uppercase; margin-bottom: 4px;">Early-Tenure Exits</div>
+                <div style="font-size: 16px; font-weight: 700; color: #F4F4F5; margin-bottom: 4px;">{metrics['early_tenure_exit_contribution']:.1f}% of Exits</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.35;">Concentrated within the first {early_tenure_threshold} years of service.</div>
             </div>
             """,
             unsafe_allow_html=True
         )
-    with p_col4:
+    with summary_col4:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 155px; border-top: 3px solid #2E7D5B; padding: 14px 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #2E7D5B; text-transform: uppercase;">Stable Retention</span>
-                    <span class="status-badge" style="background-color: rgba(46, 125, 91, 0.06); color: #2E7D5B; border: 1px solid rgba(46, 125, 91, 0.12); padding: 2px 6px; font-size: 9.5px;">STABLE</span>
-                </div>
-                <div style="font-size: 13.5px; font-weight: 600; color: #1D1D1F; margin-bottom: 4px;">Non-Travel & Levels 4-5</div>
-                <div style="font-size: 12px; color: #6E6E73; line-height: 1.4;">
-                    Senior managers and employees with zero business travel constraints show healthy retention profiles.
-                </div>
+            <div class="apple-card" style="min-height: 140px; border-left: 4px solid #EF4444; padding: 14px; margin-bottom: 16px;">
+                <div style="font-size: 10px; font-weight: 600; color: #EF4444; text-transform: uppercase; margin-bottom: 4px;">Role Hotspot Risk</div>
+                <div style="font-size: 16px; font-weight: 700; color: #F4F4F5; margin-bottom: 4px;">{insights['role']['name']}</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.35;">Highest observed functional risk concentration.</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # 5. DEPARTMENT INTELLIGENCE
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin-bottom: 24px;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="font-size: 22px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">Which departments exceed the organizational baseline?</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size: 14px; color: #6E6E73; margin-bottom: 20px;">Analyze structural voluntary departure patterns and contributions across core functional units.</p>', unsafe_allow_html=True)
-
-    dept_col1, dept_col2 = st.columns([5, 3])
-    with dept_col1:
-        # Donut & Bar Charts comparison
+    # 6. DEPARTMENT AND ROLE INTELLIGENCE
+    st.markdown('<hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 24px;">', unsafe_allow_html=True)
+    
+    col_intel1, col_intel2 = st.columns(2)
+    
+    with col_intel1:
+        st.markdown('<h2 style="font-size: 20px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">Which departments exceed the organizational baseline?</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 13.5px; color: #A1A1AA; margin-bottom: 16px;">Analyze structural voluntary departure patterns and contributions across core functional units.</p>', unsafe_allow_html=True)
+        
+        # Department chart
         dept_df_sorted = dept_df.sort_values(by="Attrition Rate", ascending=True)
         dept_fig = go.Figure(data=go.Bar(
             x=dept_df_sorted["Attrition Rate"],
@@ -248,7 +227,6 @@ def show_overview():
             hovertemplate="<b>%{y}</b><br>Attrition Rate: %{x:.1f}%<br>Exits: %{customdata[0]}<br>Headcount: %{customdata[1]}<extra></extra>",
             customdata=dept_df_sorted[["Exited", "Headcount"]].values
         ))
-        # Add baseline line
         dept_fig.add_shape(
             type="line",
             x0=metrics["overall_attrition_rate"], y0=-0.5,
@@ -264,24 +242,20 @@ def show_overview():
         )
         st.plotly_chart(dept_fig, use_container_width=True)
 
-    with dept_col2:
         if top_dept is not None:
-            render_insight_card(
+            render_dynamic_insight_card(
                 title="Department Retention Diagnostic",
-                observation=f"Sales division shows highest risk rate, while R&D dominates exit volume.",
-                evidence=f"Sales has an attrition rate of {top_dept['Attrition Rate']:.1f}% (baseline difference: {top_dept['Attrition Rate'] - metrics['overall_attrition_rate']:+.1f} pp). R&D contributed {top_dept['Exited']} exits (56.1% of all departures).",
-                interpretation="Sales departures indicate commission/quota pressure. R&D departures indicate career progression or stagnation risks in large engineering units.",
-                recommendation="Deploy localized career mapping pathways in R&D and evaluate sales quota benchmarks.",
-                priority="Critical"
+                finding=insights["department"]["finding"],
+                recommendation=insights["department"]["recommendation"],
+                confidence=insights["department"]["confidence"],
+                owner=insights["department"]["owner"],
+                priority=insights["department"]["priority"]
             )
 
-    # 6. ROLE INTELLIGENCE
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="font-size: 22px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">Where are exits concentrated by job role?</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size: 14px; color: #6E6E73; margin-bottom: 20px;">Isolate specific job roles experiencing structural retention friction.</p>', unsafe_allow_html=True)
-
-    role_col1, role_col2 = st.columns([5, 3])
-    with role_col1:
+    with col_intel2:
+        st.markdown('<h2 style="font-size: 20px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">Which job roles show the strongest concentration of exits?</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 13.5px; color: #A1A1AA; margin-bottom: 16px;">Isolate specific job roles experiencing structural retention friction.</p>', unsafe_allow_html=True)
+        
         # Role comparison chart (Top 5 high risk roles)
         role_df_sorted = role_df.sort_values(by="Attrition Rate", ascending=True).tail(5)
         role_fig = go.Figure(data=go.Bar(
@@ -308,25 +282,26 @@ def show_overview():
         )
         st.plotly_chart(role_fig, use_container_width=True)
 
-    with role_col2:
         if top_role is not None:
-            render_insight_card(
+            render_dynamic_insight_card(
                 title="Job Role Retention Diagnostic",
-                observation=f"Voluntary departures are highly concentrated in customer-facing and lab support roles.",
-                evidence=f"Sales Representatives experience a {top_role['Attrition Rate']:.1f}% attrition rate, more than double the company baseline. Laboratory Technicians contribute the largest count of exits.",
-                interpretation="High turnover points to intense customer friction, quota stress, or onboarding mismatches in entry-level profiles.",
-                recommendation="Introduce quota-ramp schedules and early tenure onboarding checks.",
-                priority="Critical"
+                finding=insights["role"]["finding"],
+                recommendation=insights["role"]["recommendation"],
+                confidence=insights["role"]["confidence"],
+                owner=insights["role"]["owner"],
+                priority=insights["role"]["priority"]
             )
 
-    # 7. WORKFORCE COMPOSITION (TENURE & CAREER SNAPSHOT)
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="font-size: 22px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">How does organizational tenure relate to observed attrition?</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size: 14px; color: #6E6E73; margin-bottom: 20px;">Analyze if voluntary departures are concentrated in early-stage hires or long-tenured employees.</p>', unsafe_allow_html=True)
-
-    tenure_col1, tenure_col2 = st.columns([5, 3])
-    with tenure_col1:
-        # Years at company distribution
+    # 7. TENURE AND WORKLOAD INTELLIGENCE
+    st.markdown('<hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
+    
+    col_intel3, col_intel4 = st.columns(2)
+    
+    with col_intel3:
+        st.markdown('<h2 style="font-size: 20px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">Are early-career employees leaving more often?</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 13.5px; color: #A1A1AA; margin-bottom: 16px;">Analyze if voluntary departures are concentrated in early-stage hires or long-tenured employees.</p>', unsafe_allow_html=True)
+        
+        # Tenure chart
         tenure_cats = sorted(df["YearsAtCompany"].unique())
         tenure_rates = []
         for yr in tenure_cats:
@@ -356,23 +331,19 @@ def show_overview():
         )
         st.plotly_chart(tenure_fig, use_container_width=True)
 
-    with tenure_col2:
-        render_insight_card(
+        render_dynamic_insight_card(
             title="Tenure Retention Diagnostic",
-            observation="Departures are heavily front-loaded in the first two years of employment.",
-            evidence=f"Employees within their first {early_tenure_threshold} years account for {metrics['early_tenure_exit_contribution']:.1f}% of total exits in view, exhibiting a cohort attrition rate of {metrics['early_tenure_attrition_rate']:.1f}%.",
-            interpretation="Onboarding transition gaps suggest expectations mismatched during recruiting or lack of initial cohort integration support.",
-            recommendation="Establish feedback surveys at 30/90/180 day checkpoints for all new hires.",
-            priority="Elevated"
+            finding=insights["early_tenure"]["finding"],
+            recommendation=insights["early_tenure"]["recommendation"],
+            confidence=insights["early_tenure"]["confidence"],
+            owner=insights["early_tenure"]["owner"],
+            priority=insights["early_tenure"]["priority"]
         )
 
-    # 8. WORKLOAD DRIVERS (OVERTIME & TRAVEL)
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="font-size: 22px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">Which workload factors appear associated with attrition?</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size: 14px; color: #6E6E73; margin-bottom: 20px;">Examine the correlation between overtime work, business travel demands, and employee turnover.</p>', unsafe_allow_html=True)
-
-    workload_col1, workload_col2 = st.columns([5, 3])
-    with workload_col1:
+    with col_intel4:
+        st.markdown('<h2 style="font-size: 20px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">Which workload factors deserve further investigation?</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 13.5px; color: #A1A1AA; margin-bottom: 16px;">Examine the correlation between overtime work, business travel demands, and employee turnover.</p>', unsafe_allow_html=True)
+        
         # Overtime Comparison Bar
         ot_data = pd.DataFrame({
             "Category": ["No Overtime", "Overtime"],
@@ -404,32 +375,37 @@ def show_overview():
         )
         st.plotly_chart(ot_fig, use_container_width=True)
 
-    with workload_col2:
-        render_insight_card(
+        render_dynamic_insight_card(
             title="Workload Driver Diagnostic",
-            observation="Systemic overtime demands constitute the strongest workplace driver of voluntary departures.",
-            evidence=f"Overtime workers exhibit an attrition rate of {ot_yes_rate:.1f}%, compared to only {ot_no_rate:.1f}% for standard hours (a 3x multiplier).",
-            interpretation="Workload burnout directly degrades employee sentiment and increases flight risk, particularly when combined with high commute distance.",
-            recommendation="Implement project manager capacity alerts when team overtime exceeds 15% of standard hours.",
-            priority="Critical"
+            finding=insights["overtime"]["finding"],
+            recommendation=insights["overtime"]["recommendation"],
+            confidence=insights["overtime"]["confidence"],
+            owner=insights["overtime"]["owner"],
+            priority=insights["overtime"]["priority"]
         )
 
-    # 9. KEY RECOMMENDATIONS PREVIEW
-    st.markdown('<hr style="border: none; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
-    st.markdown('<h2 style="font-size: 22px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">Top Strategic Actions Preview</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="font-size: 14px; color: #6E6E73; margin-bottom: 20px;">Primary evidence-linked operational interventions recommended for immediate executive prioritization.</p>', unsafe_allow_html=True)
+    # 8. RECOMMENDATIONS PREVIEW
+    st.markdown('<hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
+    st.markdown('<h2 style="font-size: 20px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">Recommended leadership focus</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 13.5px; color: #A1A1AA; margin-bottom: 16px;">Primary evidence-linked operational interventions recommended for immediate executive prioritization.</p>', unsafe_allow_html=True)
 
     rec_col1, rec_col2, rec_col3 = st.columns(3)
     with rec_col1:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #0071E3; padding: 14px 16px;">
-                <div style="font-size: 13.5px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">1. Onboarding Safeguards</div>
-                <div style="font-size: 11.5px; color: #6E6E73; line-height: 1.45; margin-bottom: 10px;">
+            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #3B82F6; padding: 14px 16px;">
+                <div style="font-size: 13.5px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">1. Strengthen early-tenure onboarding</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.45; margin-bottom: 10px;">
                     Deploy structured integration checkpoints during the first 180 days to stabilize early hires.
                 </div>
-                <div style="font-size: 10.5px; color: #86868B;">
-                    <strong>Target:</strong> Year 1 & 2 cohorts ({metrics['early_tenure_exit_contribution']:.1f}% of exits).
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Evidence:</strong> {metrics['early_tenure_attrition_rate']:.1f}% early-tenure attrition
+                </div>
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Owner:</strong> HR Business Partner
+                </div>
+                <div style="font-size: 11px; color: #3B82F6; font-weight: 600;">
+                    <strong>Priority:</strong> High
                 </div>
             </div>
             """,
@@ -438,13 +414,19 @@ def show_overview():
     with rec_col2:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #0071E3; padding: 14px 16px;">
-                <div style="font-size: 13.5px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">2. Resource Capacity Audits</div>
-                <div style="font-size: 11.5px; color: #6E6E73; line-height: 1.45; margin-bottom: 10px;">
+            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #3B82F6; padding: 14px 16px;">
+                <div style="font-size: 13.5px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">2. Review overtime concentration</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.45; margin-bottom: 10px;">
                     Establish resource warning systems when overtime requirements cross critical limits.
                 </div>
-                <div style="font-size: 10.5px; color: #86868B;">
-                    <strong>Target:</strong> Regular overtime groups (attrition rate of {ot_yes_rate:.1f}%).
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Evidence:</strong> {ot_yes_rate - ot_no_rate:.1f} percentage-point difference
+                </div>
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Owner:</strong> Department Leadership
+                </div>
+                <div style="font-size: 11px; color: #3B82F6; font-weight: 600;">
+                    <strong>Priority:</strong> High
                 </div>
             </div>
             """,
@@ -453,28 +435,31 @@ def show_overview():
     with rec_col3:
         st.markdown(
             f"""
-            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #0071E3; padding: 14px 16px;">
-                <div style="font-size: 13.5px; font-weight: 700; color: #1D1D1F; margin-bottom: 6px;">3. Quota Restructuring</div>
-                <div style="font-size: 11.5px; color: #6E6E73; line-height: 1.45; margin-bottom: 10px;">
-                    Revitalize compensation bounds, training ramps, and pathing definitions for Sales Representative positions.
+            <div class="apple-card" style="min-height: 200px; border-top: 3px solid #EF4444; padding: 14px 16px;">
+                <div style="font-size: 13.5px; font-weight: 700; color: #F4F4F5; margin-bottom: 6px;">3. Investigate top role retention</div>
+                <div style="font-size: 11.5px; color: #A1A1AA; line-height: 1.45; margin-bottom: 10px;">
+                    Revitalize compensation bounds, training ramps, and pathing definitions for highest risk positions.
                 </div>
-                <div style="font-size: 10.5px; color: #86868B;">
-                    <strong>Target:</strong> Sales Representative roles (39.8% attrition rate).
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Evidence:</strong> {top_role['Attrition Rate']:.1f}% observed attrition
+                </div>
+                <div style="font-size: 11px; color: #71717A; margin-bottom: 4px;">
+                    <strong>Owner:</strong> HR Director
+                </div>
+                <div style="font-size: 11px; color: #EF4444; font-weight: 600;">
+                    <strong>Priority:</strong> Critical
                 </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    # 10. METHODOLOGY PREVIEW
-    with st.expander("📖 Methodology & Analytical Safeguards"):
-        st.markdown(
-            """
-            * **Diagnostic Focus:** Observed statistical patterns display descriptive correlations only and do not establish direct causation. Interventions should be validated qualitative-first (e.g. exit surveys, focus groups).
-            * **Statistical Stability (Small Sample Guard):** Rate metrics are dynamically flagged as unstable when active population subsets fall below 10 records.
-            * **Privacy Compliance:** Individual profiling or risk modeling of identifiable personnel is strictly prohibited.
-            """
-        )
+    # 9. METHODOLOGY AND DISCLAIMER AREA
+    st.markdown('<hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 24px 0;">', unsafe_allow_html=True)
+    with st.expander("📖 Methodology & Analytical Disclaimers"):
+        render_academic_disclaimer()
+        render_causation_disclaimer()
+        render_statistical_limitation()
 
     # Footer
     render_footer(active_count)
