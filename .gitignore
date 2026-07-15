@@ -1,0 +1,22 @@
+# Python cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Sensitive Streamlit configuration
+.streamlit/secrets.toml
+
+# Environment variables
+.env
+.env.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
